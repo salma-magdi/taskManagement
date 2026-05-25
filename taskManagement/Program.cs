@@ -7,6 +7,10 @@ using System;
 using System.Text;
 using System.Text.Json.Serialization;
 using taskManagement.entity;
+using taskManagementApi.middleWares;
+using TaskManagmentApplication.Handler.authenticationHandler;
+using TaskManagmentApplication.helper;
+using TaskManagmentApplication.service;
 using TaslManagementinfrastructure;
 using TaslManagementinfratstructure;
 using TaslManagementinfratstructure.respository;
@@ -14,13 +18,18 @@ using TaslManagementinfratstructure.respository;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
+builder.Services.infrastructureConfiguration(builder.Configuration);
+
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(CreateProjectHandler).Assembly));
+{
+    cfg.RegisterServicesFromAssembly(typeof(RegisterCommandHandler).Assembly);
+});
 builder.Services.AddDbContext<AppDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+//register identity services
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDBContext>()
     .AddDefaultTokenProviders();
@@ -38,17 +47,30 @@ builder.Services.AddSwaggerGen(c =>
 });
 //////////////////////
 /// authentication and authorization 
-builder.Services.AddAuthentication(options =>
-{ options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; }).AddJwtBearer(
-    options => { options.TokenValidationParameters = new TokenValidationParameters { ValidateIssuer = true, ValidateAudience = true, ValidateLifetime = true, ValidateIssuerSigningKey = true, ValidIssuer = builder.Configuration["JWT:Issuer"],
-        ValidAudience =builder.Configuration["JWT:Audience"], IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])) }; });
+builder.Services.Configure<Jwt>(
+    builder.Configuration.GetSection("Jwt"));
+
+var jwtSettings = builder.Configuration
+    .GetSection("Jwt")
+    .Get<Jwt>();
+//////////
+
+
 builder.Services.AddAuthorization();
+
+
+
+
+
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 
 
 
