@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -11,6 +14,7 @@ using taskManagementApi.middleWares;
 using TaskManagmentApplication.Handler.authenticationHandler;
 using TaskManagmentApplication.helper;
 using TaskManagmentApplication.service;
+using TaskManagmentApplication.validator;
 using TaslManagementinfrastructure;
 using TaslManagementinfratstructure;
 using TaslManagementinfratstructure.respository;
@@ -41,9 +45,32 @@ builder.Services.AddControllers()
             new JsonStringEnumConverter());
     });
 
+
+// api versioning 
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new QueryStringApiVersionReader("api-version"),
+        new HeaderApiVersionReader("X-api-Version"),
+        new MediaTypeApiVersionReader("x-api-version"));
+});
+
+builder.Services.AddStackExchangeRedisCache(op =>
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
+    options.InstanceName = "TaskManagement_";
+}));
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterDTOValidator>();
+
 builder.Services.AddSwaggerGen(c =>
 {
-    c.UseInlineDefinitionsForEnums();
+    c.UseInlineDefinitionsForEnums(); 
 });
 //////////////////////
 /// authentication and authorization 

@@ -1,10 +1,11 @@
 ﻿using MediatR;
 using TaskManagmentApplication.DTO.request;
 using TaskManagmentApplication.DTO.response;
+using TaskManagmentApplication.generalResponse;
 
 namespace TaskManagmentApplication.command
 {
-    public class UpdateProjectCommand : IRequest<GetProjectResponse>
+    public class UpdateProjectCommand : IRequest<generalApiResponse<GetProjectResponse>>
     {
         public int Id { get; set; }
 

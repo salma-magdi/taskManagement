@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using taskManagement.entity;
@@ -11,6 +12,7 @@ namespace taskManagementApi.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TaskController : ControllerBase
     {
 
@@ -50,7 +52,7 @@ namespace taskManagementApi.Controller
             var data = await mediator.Send(command);
             return CreatedAtAction(
             nameof(getTaskWithinProject),
-            new { name = data.Name },
+           
             data);
 
         }
@@ -59,10 +61,10 @@ namespace taskManagementApi.Controller
         [HttpPut("updatestatus")]
         public async Task<IActionResult> UpdateTaskStatus(int taskId,[FromBody] UpdateTaskRequest request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest("Data not valid");
-            }
+            //if (!modelstate.isvalid)
+            //{
+            //    return badrequest("data not valid");
+            //}
 
             var command = new UpdateTaskStatusCommand(taskId, request.Status);
 

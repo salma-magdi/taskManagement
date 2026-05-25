@@ -26,68 +26,45 @@ namespace TaskManagmentApplication.service
 
         public async Task<Auth> Register(RegisterDTO registeredModel)
         {
-            // check email
             var emailUser = await userManager.FindByEmailAsync(registeredModel.Email);
-
             if (emailUser != null)
-            {
-                return new Auth
-                {
-                    message = "Email is already registered"
-                };
-            }
+                throw new Exception("Email already exists");
 
-            // check username
             var nameUser = await userManager.FindByNameAsync(registeredModel.UserName);
-
             if (nameUser != null)
-            {
-                return new Auth
-                {
-                    message = "Username is already registered"
-                };
-            }
+                throw new Exception("Username already exists");
 
-            // create user
             var user = new ApplicationUser
             {
                 Email = registeredModel.Email,
                 UserName = registeredModel.UserName
             };
 
-            // save user
+          
             var result = await userManager.CreateAsync(user, registeredModel.Password);
 
             if (!result.Succeeded)
             {
-                string errors = string.Empty;
-
-                foreach (var error in result.Errors)
-                {
-                    errors += $"{error.Description}, ";
-                }
-
-                return new Auth
-                {
-                    message = errors
-                };
+                throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
             }
 
-            // add role
-            await userManager.AddToRoleAsync(user, "User");
+            var roleResult = await userManager.AddToRoleAsync(user, "User");
 
-            // create token
+            if (!roleResult.Succeeded)
+            {
+                throw new Exception("Failed to assign role");
+            }
+
             var jwtSecurityToken = await CreateJwtToken(user);
 
             return new Auth
             {
                 email = user.Email,
-               Username = user.UserName,
+                Username = user.UserName,
                 IsAuthenticated = true,
-               token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-               expireOn = jwtSecurityToken.ValidTo,
-               Roles= new List<string> { "User" },
-                message = "Registered Successfully"
+                Roles = new List<string> { "User" },
+                token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+                expireOn = jwtSecurityToken.ValidTo
             };
         }
 
@@ -137,11 +114,8 @@ namespace TaskManagmentApplication.service
 
             if (User == null)
             {
-                return new Auth
-                {
-                    IsAuthenticated = false,
-                    message = "Invalid email or password"
-                };
+                throw new Exception("User not found");
+
             }
 
             //  Check password
@@ -149,11 +123,8 @@ namespace TaskManagmentApplication.service
 
             if (!PasswordValid)
             {
-                return new Auth
-                {
-                    IsAuthenticated = false,
-                    message = "Invalid email or password"
-                };
+               throw new Exception("Invalid password");
+
             }
 
             //  Get roles
@@ -169,8 +140,7 @@ namespace TaskManagmentApplication.service
             auth.Roles = roles.ToList();
             auth.token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
             auth.expireOn = jwtToken.ValidTo;
-            auth.message = "Login successful";
-
+           
             return auth;
         }
     }

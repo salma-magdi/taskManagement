@@ -6,10 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TaskManagmentApplication.DTO.response;
+using TaskManagmentApplication.generalResponse;
 
 namespace TaskManagmentApplication.query
 {
-   public record GetProjectByIdQuery :IRequest<GetProjectResponse>
+   public record GetProjectByIdQuery :IRequest<generalApiResponse<GetProjectResponse>>
     {
        internal readonly int _projectId;
 

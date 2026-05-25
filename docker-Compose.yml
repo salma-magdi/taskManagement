@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: taskmanagement-sqlserver
+
+    environment:
+      SA_PASSWORD: "Your_Password123"
+      ACCEPT_EULA: "Y"
+
+    ports:
+      - "1433:1433"
+
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+
+    networks:
+      - taskmanagement-network
+
+  webapp:
+    build: .
+    container_name: taskmanagement-api
+
+    ports:
+      - "8080:8080"
+
+    depends_on:
+      - sqlserver
+
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+
+    networks:
+      - taskmanagement-network
+
+volumes:
+  sqlserver_data:
+
+networks:
+  taskmanagement-network:
+    driver: bridgec

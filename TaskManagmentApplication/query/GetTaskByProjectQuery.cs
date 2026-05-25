@@ -5,10 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TaskManagmentApplication.DTO.response;
+using TaskManagmentApplication.generalResponse;
 
 namespace TaskManagmentApplication.query
 {
-  public record GetTaskByProjectQuery :IRequest<IEnumerable<GetTaskResponse>>
+  public record GetTaskByProjectQuery :IRequest<generalApiResponse<IEnumerable<GetTaskResponse>>>
     {
         public GetTaskByProjectQuery(int projectId)
         {

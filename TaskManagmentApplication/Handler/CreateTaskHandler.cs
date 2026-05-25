@@ -9,10 +9,11 @@ using taskManagement.entity;
 using TaskManagmentApplication.command;
 using TaskManagmentApplication.DTO.request;
 using TaskManagmentApplication.DTO.response;
+using TaskManagmentApplication.generalResponse;
 
 namespace TaskManagmentApplication.Handler
 {
-  public class CreateTaskHandler:IRequestHandler<CreateTaskCommand,GetTaskResponse>
+  public class CreateTaskHandler:IRequestHandler<CreateTaskCommand,generalApiResponse<GetTaskResponse>>
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unit;
@@ -23,7 +24,7 @@ namespace TaskManagmentApplication.Handler
             _unit = unit;
         }
 
-        public async Task<GetTaskResponse> Handle(CreateTaskCommand request, CancellationToken cancellationToken)
+        public async Task<generalApiResponse<GetTaskResponse>> Handle(CreateTaskCommand request, CancellationToken cancellationToken)
         {
             //mapping 
            var entity=  _mapper.Map<TaskItem>(request.request);
@@ -33,7 +34,7 @@ namespace TaskManagmentApplication.Handler
             // mapping 
             var createdEntity= _mapper.Map<GetTaskResponse>(entity);
            
-            return createdEntity;
+            return  generalApiResponse<GetTaskResponse>.SuccessResult(createdEntity, "Task created successfully");
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Reflection.Metadata.Ecma335;
@@ -11,6 +12,7 @@ namespace taskManagementApi.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class projectController : ControllerBase
     {
         private readonly IMediator mediator;
@@ -49,8 +51,8 @@ namespace taskManagementApi.Controller
         [HttpPost("createProject")]
         public async Task<IActionResult> CreateProject([FromBody] CreateProjectRequest request)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            //if (!ModelState.IsValid)
+            //    return BadRequest(ModelState);
 
             var command = new CreateprojectCommand(request);
 
@@ -58,7 +60,7 @@ namespace taskManagementApi.Controller
 
             return CreatedAtAction(
                 nameof(GetProjectById),
-                new { name = data.Name },
+                
                 data
             );
         }
@@ -66,10 +68,10 @@ namespace taskManagementApi.Controller
         public async Task<IActionResult> updateProject(int id,[FromBody] UpdateProjectRequest request)
         {
 
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            //if (!ModelState.IsValid)
+            //{
+            //    return BadRequest(ModelState);
+            //}
             var command = new UpdateProjectCommand(id,request);
             var data = await mediator.Send(command);
             return Ok(data);

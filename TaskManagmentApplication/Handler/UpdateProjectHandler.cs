@@ -9,10 +9,11 @@ using taskManagement.entity;
 using TaskManagmentApplication.command;
 using TaskManagmentApplication.DTO.request;
 using TaskManagmentApplication.DTO.response;
+using TaskManagmentApplication.generalResponse;
 
 namespace TaskManagmentApplication.Handler
 {
-    public class UpdateProjectHandler : IRequestHandler<UpdateProjectCommand, GetProjectResponse>
+    public class UpdateProjectHandler : IRequestHandler<UpdateProjectCommand, generalApiResponse<GetProjectResponse>>
     {
 
         private readonly IMapper mapper;
@@ -24,7 +25,7 @@ namespace TaskManagmentApplication.Handler
             this.unit = unit;
         }
 
-        public async Task<GetProjectResponse> Handle(UpdateProjectCommand request, CancellationToken cancellationToken)
+        public async Task<generalApiResponse<GetProjectResponse>> Handle(UpdateProjectCommand request, CancellationToken cancellationToken)
         {
             // get project
             var entity = await unit.Projects.GetProjectByIdAsync(request.Id);
@@ -41,9 +42,9 @@ namespace TaskManagmentApplication.Handler
             await unit.SaveAsync();
 
             // map entity (NOT update result)
-            var mapped = mapper.Map<GetProjectResponse>(entity);
+            var mapped = mapper.Map<generalApiResponse<GetProjectResponse>>(entity);
 
-            return mapped;
+           return generalApiResponse<GetProjectResponse>.SuccessResult(mapped.Data, "Project updated successfully");
         }
     }
 }

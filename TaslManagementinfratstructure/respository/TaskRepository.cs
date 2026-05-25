@@ -5,12 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using taskManagement.entity;
+using TaslManagementinfrastructure.service;
 
 namespace TaslManagementinfratstructure.respository
 {
     public class TaskRepository : GenericRespository<TaskItem>, ITaskRepository
     {
-        public TaskRepository(AppDBContext _context) : base(_context)
+        public TaskRepository(AppDBContext _context,IRedisCache _cache) : base(_context,_cache)
         {
         }
 

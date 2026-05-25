@@ -6,10 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using TaskManagmentApplication.DTO.request;
 using TaskManagmentApplication.DTO.response;
+using TaskManagmentApplication.generalResponse;
 
 namespace TaskManagmentApplication.command
 {
-    public record CreateprojectCommand:IRequest<GetProjectResponse>
+    public record CreateprojectCommand:IRequest<generalApiResponse<GetProjectResponse>>
     {
 
         // create a project 

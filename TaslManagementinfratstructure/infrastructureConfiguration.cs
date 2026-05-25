@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using taskManagement.entity;
+using TaslManagementinfrastructure.service;
 using TaslManagementinfratstructure;
 using TaslManagementinfratstructure.respository;
 
@@ -35,8 +36,8 @@ namespace TaskManagmentApplication.service
                 // apply unit of work
                 services.AddScoped<IUnitOfWork,UnitOfWork>();
                
-
-              services.AddScoped<IAuthService,authService>();
+            services.AddSingleton<IRedisCache,RedisCacheService>();
+            services.AddScoped<IAuthService,authService>();
               services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme =

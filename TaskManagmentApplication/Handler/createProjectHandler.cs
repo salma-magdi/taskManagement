@@ -3,8 +3,10 @@ using MediatR;
 using taskManagement.entity;
 using TaskManagmentApplication.command;
 using TaskManagmentApplication.DTO.response;
+using TaskManagmentApplication.generalResponse;
 
-public class CreateProjectHandler : IRequestHandler<CreateprojectCommand, GetProjectResponse>
+public class CreateProjectHandler
+    : IRequestHandler<CreateprojectCommand, generalApiResponse<GetProjectResponse>>
 {
     private readonly IMapper _mapper;
     private readonly IUnitOfWork _unit;
@@ -15,16 +17,25 @@ public class CreateProjectHandler : IRequestHandler<CreateprojectCommand, GetPro
         _unit = unit;
     }
 
-   
-
-    public async Task<GetProjectResponse> Handle(CreateprojectCommand request, CancellationToken cancellationToken)
+    public async Task<generalApiResponse<GetProjectResponse>> Handle(
+        CreateprojectCommand request,
+        CancellationToken cancellationToken)
     {
-        
+        // request -> entity
         var entity = _mapper.Map<Project>(request.request);
-        var created = await _unit.Projects.CreateAsync(entity);
-        var createdProject=_mapper.Map<GetProjectResponse>(created);
-        await _unit.SaveAsync();
-        return createdProject;
 
+        // save project
+        var created = await _unit.Projects.CreateAsync(entity);
+
+        await _unit.SaveAsync();
+
+        // entity -> response dto
+        var response = _mapper.Map<GetProjectResponse>(created);
+
+        // wrap response
+        return generalApiResponse<GetProjectResponse>.SuccessResult(
+            response,
+            "Project created successfully"
+        );
     }
 }

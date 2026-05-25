@@ -5,20 +5,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using taskManagement.entity;
+using TaslManagementinfrastructure.service;
 
 namespace TaslManagementinfratstructure.respository
 {
     public class ProjectRepository : GenericRespository<Project>, IProjectRepository
     {
         private readonly AppDBContext context;
-       
-       
 
-        public ProjectRepository(AppDBContext _context) : base(_context)
+        public ProjectRepository(AppDBContext _context, IRedisCache _cache) : base(_context, _cache)
         {
-            this.context = _context;
-            
         }
+
+
+
 
 
         // get allproject 

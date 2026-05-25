@@ -1,19 +1,17 @@
 ﻿using AutoMapper;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using taskManagement.entity;
 using TaskManagmentApplication.DTO.response;
+using TaskManagmentApplication.generalResponse;
 using TaskManagmentApplication.query;
 
 namespace TaskManagmentApplication.Handler
 {
-    public class GetTasksInProjectHandler : IRequestHandler<GetTaskByProjectQuery, IEnumerable<GetTaskResponse>>
+    public class GetTasksInProjectHandler
+        : IRequestHandler<
+            GetTaskByProjectQuery,
+            generalApiResponse<IEnumerable<GetTaskResponse>>>
     {
-
         private readonly IMapper mapper;
         private readonly IUnitOfWork unit;
 
@@ -23,15 +21,17 @@ namespace TaskManagmentApplication.Handler
             this.unit = unit;
         }
 
-        public async  Task<IEnumerable<GetTaskResponse>> Handle(GetTaskByProjectQuery request, CancellationToken cancellationToken)
+        public async Task<generalApiResponse<IEnumerable<GetTaskResponse>>> Handle(
+            GetTaskByProjectQuery request,
+            CancellationToken cancellationToken)
         {
-            // get all task in the project 
-            var tasks = await unit.Tasks.GetTasksByProjectIdAsync(request.ProjectId);
+            var tasks = await unit.Tasks
+                .GetTasksByProjectIdAsync(request.ProjectId);
 
             var result = mapper.Map<IEnumerable<GetTaskResponse>>(tasks);
 
-            return result;
-
+            return generalApiResponse<IEnumerable<GetTaskResponse>>
+                .SuccessResult(result, "Tasks retrieved successfully");
         }
     }
 }

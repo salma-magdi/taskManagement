@@ -8,6 +8,7 @@ namespace taskManagementApi.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
+    
     public class AccountController : ControllerBase
     {
         private readonly IMediator mediator;
@@ -20,10 +21,6 @@ namespace taskManagementApi.Controller
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDTO registeredUser)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
 
             var command = new RegisterCommand(registeredUser);
 
@@ -35,11 +32,7 @@ namespace taskManagementApi.Controller
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDTO user)
         {
-            if (!ModelState.IsValid)
-            {
 
-                return BadRequest(ModelState);
-            }
 
             var command = new LoginCommand(user);
             var data = await mediator.Send(command);

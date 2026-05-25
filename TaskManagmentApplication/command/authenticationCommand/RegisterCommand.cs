@@ -6,10 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using taskManagementDomain;
 using TaskManagmentApplication.DTO.request;
+using TaskManagmentApplication.generalResponse;
 
 namespace TaskManagmentApplication.command.authenticationCommand
 {
-    public class RegisterCommand : IRequest<Auth>
+    public class RegisterCommand : IRequest<generalApiResponse<Auth>>
     {
         public RegisterCommand(RegisterDTO registeredUser)
         {

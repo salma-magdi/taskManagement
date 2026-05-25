@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using taskManagement.entity;
+using TaslManagementinfrastructure.Migrations;
+using TaslManagementinfrastructure.service;
 
 namespace TaslManagementinfratstructure.respository
 {
@@ -12,11 +14,13 @@ namespace TaslManagementinfratstructure.respository
     {
         private readonly AppDBContext context;
       internal readonly DbSet<T> db;
-        
-        public GenericRespository( AppDBContext _context)
+        internal readonly IRedisCache cache;
+
+        public GenericRespository( AppDBContext _context,IRedisCache _cache)
         {
             this.context = _context;
             this.db = context.Set<T>();
+            this.cache = _cache;
         }
 
 
@@ -57,7 +61,11 @@ namespace TaslManagementinfratstructure.respository
 
         public async Task<T> GetByIdAsync(int id)
         {
+
+            
             return await db.FindAsync(id);
+           
+
         }
     }
 }

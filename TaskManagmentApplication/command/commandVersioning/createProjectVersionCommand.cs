@@ -5,19 +5,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TaskManagmentApplication.DTO.request;
-using TaskManagmentApplication.DTO.response;
 using TaskManagmentApplication.generalResponse;
 
-namespace TaskManagmentApplication.command
+namespace TaskManagmentApplication.command.commandVersioning
 {
-    public class CreateTaskCommand:IRequest<generalApiResponse<GetTaskResponse>>
+    public class createProjectVersionCommand : IRequest<string>
     {
-        public CreateTaskCommand(CreateTaskRequest request)
+        public createProjectVersionCommand(createProjectVersioning request)
         {
             this.request = request;
         }
 
-        public CreateTaskRequest request { get;}
+        public createProjectVersioning request { get; set; }
+       
 
     }
 }
