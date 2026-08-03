@@ -26,10 +26,11 @@ namespace TaskManagmentApplication.service
 
         public async Task<Auth> Register(RegisterDTO registeredModel)
         {
+            // check if the email found or not 
             var emailUser = await userManager.FindByEmailAsync(registeredModel.Email);
             if (emailUser != null)
                 throw new Exception("Email already exists");
-
+             // if not exit find it by her name 
             var nameUser = await userManager.FindByNameAsync(registeredModel.UserName);
             if (nameUser != null)
                 throw new Exception("Username already exists");
@@ -40,7 +41,7 @@ namespace TaskManagmentApplication.service
                 UserName = registeredModel.UserName
             };
 
-          
+           //if not found create that user and put his name 
             var result = await userManager.CreateAsync(user, registeredModel.Password);
 
             if (!result.Succeeded)
@@ -48,16 +49,16 @@ namespace TaskManagmentApplication.service
                 throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
             }
 
-            var roleResult = await userManager.AddToRoleAsync(user, "User");
+            var roleResult = await userManager.AddToRoleAsync(user, "User"); // if created success create the r9le 
 
             if (!roleResult.Succeeded)
             {
                 throw new Exception("Failed to assign role");
             }
 
-            var jwtSecurityToken = await CreateJwtToken(user);
+            var jwtSecurityToken = await CreateJwtToken(user); // if create role is sucess create jwt 
 
-            return new Auth
+            return new Auth  // mapping to new values
             {
                 email = user.Email,
                 Username = user.UserName,
@@ -70,11 +71,14 @@ namespace TaskManagmentApplication.service
 
         private async Task<JwtSecurityToken> CreateJwtToken(ApplicationUser user)
         {
+            //get claims
             var userClaims = await userManager.GetClaimsAsync(user);
+            //get user
             var roles = await userManager.GetRolesAsync(user);
-
+            // select role 
             var roleClaims = roles.Select(role => new Claim(ClaimTypes.Role, role)).ToList();
 
+            // get claims with setting 
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
@@ -91,7 +95,7 @@ namespace TaskManagmentApplication.service
 
             var signingCredentials = new SigningCredentials(
                 symmetricSecurityKey,
-                SecurityAlgorithms.HmacSha256
+                SecurityAlgorithms.HmacSha256 // algorithim 
             );
 
             var jwtSecurityToken = new JwtSecurityToken(

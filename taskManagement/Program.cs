@@ -59,13 +59,13 @@ builder.Services.AddApiVersioning(options =>
         new MediaTypeApiVersionReader("x-api-version"));
 });
 
-builder.Services.AddStackExchangeRedisCache(op =>
+
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
     options.InstanceName = "TaskManagement_";
-}));
+});
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterDTOValidator>();
 
 builder.Services.AddSwaggerGen(c =>

@@ -1,37 +1,40 @@
-version: '3.8'
-
 services:
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: taskmanagement-sqlserver
-
     environment:
       SA_PASSWORD: "Your_Password123"
       ACCEPT_EULA: "Y"
-
     ports:
       - "1433:1433"
-
     volumes:
       - sqlserver_data:/var/opt/mssql
-
     networks:
       - taskmanagement-network
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "Your_Password123", "-Q", "SELECT 1"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
 
-  webapp:
-    build: .
+  api:
+    build:
+      context: .
+      dockerfile: dockerfile
     container_name: taskmanagement-api
-
     ports:
-      - "8080:8080"
-
-    depends_on:
-      - sqlserver
-
+      - "8080:80"
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
-
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=TaskManagementDb;User Id=sa;Password=Your_Password123;TrustServerCertificate=True;
+      - jwt__key=9ztJt1MrwW0orXPf9U0+hqIEz7r8+pndLv17QYP4ds826tmLFfbwTS7Qzv5MW6SZugGjC0wAXjnLYeGPY9CavQ==
+      - jwt__issurer=SecureApi
+      - jwt__audience=secureApi
+      - jwt__durationInMinutes=60
+    depends_on:
+      sqlserver:
+        condition: service_healthy
     networks:
       - taskmanagement-network
 
@@ -40,4 +43,4 @@ volumes:
 
 networks:
   taskmanagement-network:
-    driver: bridgec
+    driver: bridge
